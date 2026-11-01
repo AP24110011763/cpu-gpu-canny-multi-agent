@@ -1,0 +1,12 @@
+BOT 2 - what to do (no Terminal needed)
+
+1. Double-click this zip's contents so you see two folders.
+2. Open "1-UPLOAD-THESE-TO-GITHUB". In Finder press Cmd+Shift+. (period) so the hidden ".github" folder shows.
+3. On github.com open your repo -> Add file -> Upload files.
+4. Drag in everything inside "1-UPLOAD-THESE-TO-GITHUB": bot2, inbox, .github  (do NOT upload the other folder).
+5. Commit directly to main.
+6. Repo -> Settings -> Actions -> General -> Workflow permissions -> "Read and write permissions" -> Save.
+7. Test: upload any file into the repo's "inbox" folder. In about a minute it is moved to the right folder,
+   and the issue "Repo Activity Log (Bot 2)" shows what happened.
+
+"2-OPTIONAL-Mac-drop-folder" is only for pushing from your Mac without opening github.com. Never upload it to GitHub.
