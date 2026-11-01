@@ -6,12 +6,13 @@ Generated automatically by Bot 1 from the files in this repository.
 
 - Python: 12 file(s)
 - Markdown: 4 file(s)
+- YAML: 1 file(s)
 
 ## Frameworks and libraries
 
 PyGithub, pytest, anthropic, python-dotenv
 
-## Files (19)
+## Files (20)
 
 - `Bot1/1-UPLOAD-THESE-TO-GITHUB/bot2/README.md`
 - `Bot1/1-UPLOAD-THESE-TO-GITHUB/bot2/__init__.py`
@@ -32,3 +33,4 @@ PyGithub, pytest, anthropic, python-dotenv
 - `Bot1/START-HERE.txt`
 - `DAILY_UPDATES.md`
 - `README.md`
+- `github/workflows/bot2-inbox.yml`
