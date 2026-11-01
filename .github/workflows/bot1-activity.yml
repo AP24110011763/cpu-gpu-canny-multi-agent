@@ -1,0 +1,31 @@
+name: Bot 2 - Repo Activity Updates
+
+on:
+  push:
+    paths-ignore: ['inbox/**']
+  pull_request:
+    types: [opened, closed, reopened]
+  issues:
+    types: [opened, closed, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  report:
+    if: github.event.sender.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r bot2/requirements.txt
+      - name: Post update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m bot2 activity
