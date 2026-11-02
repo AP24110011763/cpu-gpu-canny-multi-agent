@@ -1,0 +1,8 @@
+# Runtime Dependencies:
+# Bot 2 uses Python 3.9+ standard library modules exclusively (urllib, json, ast, re, dataclasses).
+# Zero external packages are required to run Bot 2 in GitHub Actions runners.
+
+# Optional Developer & Testing Dependencies:
+pytest>=8.0.0
+pytest-cov>=4.1.0
+flake8>=7.0.0
