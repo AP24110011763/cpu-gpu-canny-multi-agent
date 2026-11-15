@@ -127,3 +127,18 @@ def test_trace_text_cannot_inject_html(tmp_path):
 def test_failed_run_still_has_a_workflow(tmp_path):
     html_, _ = page(tmp_path, TRACE, "mock_gpu_error")
     assert "How this run flowed" in html_ and "correctness" in html_
+
+
+def test_listener_sees_stage_starts_and_model_calls_and_cannot_break_the_run():
+    seen = []
+    llm = TracingLLM(ScriptedLLM([reply("a"), reply("b", "c")]), fake_clock(), on_event=lambda k, d: seen.append((k, d["stage"], d["llm_calls"], list(d["tools"]))))
+    llm.start_stage("agent1")
+    llm.chat([])
+    llm.chat([])
+    assert seen == [("stage_start", "agent1", 0, []), ("model_call", "agent1", 1, ["a"]), ("model_call", "agent1", 2, ["a", "b", "c"])]
+
+    def boom(kind, data):
+        raise RuntimeError("ui crashed")
+    safe = TracingLLM(ScriptedLLM([reply("a")]), fake_clock(), on_event=boom)
+    safe.start_stage("agent1")
+    assert safe.chat([])["tool_calls"][0]["name"] == "a"

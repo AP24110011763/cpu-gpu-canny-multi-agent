@@ -16,8 +16,8 @@ ORDER = list(AGENTS)
 
 
 class TracingLLM:
-    def __init__(self, inner, clock=time.perf_counter) -> None:
-        self._inner, self._clock = inner, clock
+    def __init__(self, inner, clock=time.perf_counter, on_event=None) -> None:
+        self._inner, self._clock, self._on_event = inner, clock, on_event
         self._stages: dict[str, dict] = {}
         self._current: str | None = None
         self._started = 0.0
@@ -29,6 +29,7 @@ class TracingLLM:
         self.end_stage()
         self._current, self._started = key, self._clock()
         self._stages.setdefault(key, {"seconds": 0.0, "llm_calls": 0, "llm_seconds": 0.0, "tools": []})
+        self._emit("stage_start")
 
     def end_stage(self) -> None:
         if self._current:
@@ -46,7 +47,18 @@ class TracingLLM:
                 st["llm_seconds"] += self._clock() - t0
         if st is not None:
             st["tools"] += [c.get("name", "?") for c in (reply.get("tool_calls") or [])]
+            self._emit("model_call")
         return reply
+
+    def _emit(self, kind: str) -> None:
+        """Tell a listener (the dashboard) what is happening now. A broken listener must never break a run."""
+        if self._on_event and self._current:
+            st = self._stages[self._current]
+            try:
+                self._on_event(kind, {"stage": self._current, "llm_calls": st["llm_calls"], "tools": list(st["tools"]),
+                                      "elapsed": self._clock() - self._started})
+            except Exception:
+                pass
 
     def trace(self) -> dict:
         self.end_stage()

@@ -3,3 +3,9 @@ ollama
 opencv-python
 numpy
 pytest
+streamlit   # only for the dashboard (app.py)
+
+# GPU path (optional, needs an NVIDIA GPU with a CUDA 12 driver). Without it the project still runs,
+# CPU-only, and the GPU tests are skipped. Install the build that matches your CUDA version, for example:
+#   pip install cupy-cuda12x
+# Check it with:  python scripts/verify_gpu.py
