@@ -1,0 +1,50 @@
+{
+  "_comment": "DEVELOPMENT-ONLY MOCK. These numbers were made up by hand to exercise Agent 3 in one specific situation. They are NOT real measurements and must never be shown as results.",
+  "plan": {
+    "task": "canny_edge_detection",
+    "image_path": "mock/image.png",
+    "low_threshold": 100,
+    "high_threshold": 200,
+    "run_cpu": true,
+    "run_gpu": true,
+    "repetitions": 20,
+    "warmup_runs": 3,
+    "run_id": "mock_gpu_missing",
+    "notes": ""
+  },
+  "image_info": {
+    "width": 1600,
+    "height": 899,
+    "channels": 3,
+    "megapixels": 1.4384
+  },
+  "gpu_name": null,
+  "cpu": {
+    "device": "cpu",
+    "stage_times_ms": {
+      "gaussian_blur": 1.0,
+      "sobel_gradients": 10.0,
+      "non_max_suppression": 100.0,
+      "hysteresis": 20.0
+    },
+    "total_time_ms": 131.0,
+    "total_time_std_ms": 6.55,
+    "transfer_time_ms": null,
+    "kernel_time_ms": null,
+    "opencv_reference_time_ms": 4.0,
+    "repetitions": 20,
+    "warmup_runs": 3,
+    "output_path": null,
+    "error": null
+  },
+  "gpu": null,
+  "correctness": {
+    "performed": false,
+    "pixel_agreement_pct": null,
+    "gradient_mean_abs_diff": null,
+    "threshold_pct": 98.0,
+    "passed": null,
+    "note": "Not performed: needs a successful CPU run and a successful GPU run."
+  },
+  "agent2_notes": "GPU was planned but is not usable (CuPy is not installed in this environment); results are CPU-only"
+}

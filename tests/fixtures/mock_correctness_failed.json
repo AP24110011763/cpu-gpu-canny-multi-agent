@@ -1,0 +1,67 @@
+{
+  "_comment": "DEVELOPMENT-ONLY MOCK. These numbers were made up by hand to exercise Agent 3 in one specific situation. They are NOT real measurements and must never be shown as results.",
+  "plan": {
+    "task": "canny_edge_detection",
+    "image_path": "mock/image.png",
+    "low_threshold": 100,
+    "high_threshold": 200,
+    "run_cpu": true,
+    "run_gpu": true,
+    "repetitions": 20,
+    "warmup_runs": 3,
+    "run_id": "mock_correctness_failed",
+    "notes": ""
+  },
+  "image_info": {
+    "width": 1600,
+    "height": 899,
+    "channels": 3,
+    "megapixels": 1.4384
+  },
+  "gpu_name": "MOCK GPU",
+  "cpu": {
+    "device": "cpu",
+    "stage_times_ms": {
+      "gaussian_blur": 1.0,
+      "sobel_gradients": 10.0,
+      "non_max_suppression": 100.0,
+      "hysteresis": 20.0
+    },
+    "total_time_ms": 131.0,
+    "total_time_std_ms": 6.55,
+    "transfer_time_ms": null,
+    "kernel_time_ms": null,
+    "opencv_reference_time_ms": 4.0,
+    "repetitions": 20,
+    "warmup_runs": 3,
+    "output_path": null,
+    "error": null
+  },
+  "gpu": {
+    "device": "gpu",
+    "stage_times_ms": {
+      "gaussian_blur": 2.0,
+      "sobel_gradients": 2.0,
+      "non_max_suppression": 2.0,
+      "hysteresis": 20.0
+    },
+    "total_time_ms": 29.0,
+    "total_time_std_ms": 0.3,
+    "transfer_time_ms": 3.0,
+    "kernel_time_ms": 6.0,
+    "opencv_reference_time_ms": null,
+    "repetitions": 20,
+    "warmup_runs": 3,
+    "output_path": null,
+    "error": null
+  },
+  "correctness": {
+    "performed": true,
+    "pixel_agreement_pct": 91.2,
+    "gradient_mean_abs_diff": 7.4,
+    "threshold_pct": 98.0,
+    "passed": false,
+    "note": "edge overlap within 1 px 0.410"
+  },
+  "agent2_notes": ""
+}
