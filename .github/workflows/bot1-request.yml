@@ -1,0 +1,53 @@
+name: Bot 1 - Request
+
+# Actions tab -> "Bot 1 - Request" -> Run workflow: Bot 1 asks what to do (list / delete / move a file).
+# To PUSH a file, upload it into the inbox/ folder (the Inbox Organizer files it).
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: What should Bot 1 do?
+        type: choice
+        required: true
+        options:
+          - list-files
+          - delete-file
+          - move-file
+      path:
+        description: "File path in the repo, e.g. docs/test.txt (for list-files: optional folder)"
+        required: false
+        default: ""
+      new_path:
+        description: "move-file only: the new path, e.g. archive/test.txt"
+        required: false
+        default: ""
+      confirm:
+        description: "delete-file only: tick to confirm the delete"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # delete / move files
+  issues: write     # post the result to the activity log
+
+concurrency:
+  group: bot1-inbox
+  cancel-in-progress: false
+
+jobs:
+  request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r bot1/requirements.txt
+      - name: Do the request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BOT_ACTION: ${{ inputs.action }}
+          BOT_PATH: ${{ inputs.path }}
+          BOT_NEW_PATH: ${{ inputs.new_path }}
+          BOT_CONFIRM: ${{ inputs.confirm }}
+        run: python -m bot1 request

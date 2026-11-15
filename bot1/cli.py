@@ -1,4 +1,4 @@
-"""Bot 1 command line.  Automatic (GitHub Actions): organize, activity.  Local: push, watch."""
+"""Bot 1 command line.  Ask me: menu (default).  Automatic (GitHub Actions): organize, activity, request.  Local: push, watch."""
 from __future__ import annotations
 
 import argparse
@@ -17,6 +17,7 @@ from .activity import GitHubLog, build, post
 from .ai_placer import make_placer
 from .organize import format_report, organize, push_branch
 from .push import format_result, push_files, watch
+from .requests_menu import run_menu, run_request, setup_config
 
 
 def _model() -> str:
@@ -60,6 +61,31 @@ def cmd_activity() -> int:
     return 0
 
 
+def cmd_request() -> int:
+    """(GitHub Actions) run the request chosen on the 'Bot 1 - Request' form."""
+    token, name = os.environ["GITHUB_TOKEN"], os.environ["GITHUB_REPOSITORY"]
+    register_secrets([token])
+    repo = GitHubRepo(token, name, os.environ.get("GITHUB_REF_NAME") or None)
+    action = os.environ.get("BOT_ACTION", "")
+    try:
+        result = run_request(repo, action, os.environ.get("BOT_PATH", ""), os.environ.get("BOT_NEW_PATH", ""),
+                             os.environ.get("BOT_CONFIRM", "").lower() == "true")
+        failed = False
+    except BotError as e:
+        result, failed = f"Request failed: {redact(str(e))}", True
+    print(redact(result))
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a", encoding="utf-8") as f:
+            f.write(f"### Bot 1 request: {action}\n```\n{redact(result)}\n```\n")
+    if action != "list-files":
+        try:
+            post(GitHubLog(token, name, os.environ.get("GITHUB_API_URL")), f"**Request: {action}**\n\n{redact(result)}")
+        except Exception as e:
+            print(f"Could not post to the activity log: {type(e).__name__}")
+    return 1 if failed else 0
+
+
 def _connect(args):
     cfg = load_config(args.repo, args.branch)
     register_secrets(cfg.secrets())
@@ -68,7 +94,10 @@ def _connect(args):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="bot1", description="Bot 1 - file organizer and repo reporter")
-    sub = ap.add_subparsers(dest="cmd", required=True)
+    sub = ap.add_subparsers(dest="cmd")
+    mn = sub.add_parser("menu", help="(default) ask me what to do: push, delete, move or list files")
+    mn.add_argument("--repo"), mn.add_argument("--branch")
+    sub.add_parser("request", help="(GitHub Actions) run the request chosen on the Request form")
     sub.add_parser("organize", help="(GitHub Actions) file everything in inbox/")
     sub.add_parser("activity", help="(GitHub Actions) post the current event to the activity log")
     pu = sub.add_parser("push", help="push local file(s) into the right folder of your repo")
@@ -81,6 +110,14 @@ def main(argv=None) -> int:
         s.add_argument("--repo"), s.add_argument("--branch"), s.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
     try:
+        if args.cmd in (None, "menu"):
+            cfg = setup_config(repo_override=getattr(args, "repo", None), branch_override=getattr(args, "branch", None))
+            register_secrets(cfg.secrets())
+            repo = GitHubRepo(cfg.github_token, cfg.repo, cfg.branch)
+            print(f"Connected to {repo.name} (branch: {repo.branch}).")
+            return run_menu(repo, make_placer(cfg.anthropic_key, cfg.model))
+        if args.cmd == "request":
+            return cmd_request()
         if args.cmd == "organize":
             return cmd_organize()
         if args.cmd == "activity":
