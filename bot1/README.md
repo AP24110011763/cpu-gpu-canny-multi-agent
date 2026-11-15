@@ -16,6 +16,15 @@ and for every file Bot 1 files.
 files that look like passwords/keys are deleted and reported (revoke them: they stay in git history); `.git/`, `.github/`,
 `bot1/` are off limits; `..` and absolute paths are refused.
 
+## Ask-me mode: Bot 1 asks what you want to do
+Run `python3 -m bot1` (or double-click `Start-Bot1-Menu.command` on a Mac). Bot 1 asks:
+1) push a file, 2) delete a file, 3) move/rename a file, 4) list files, 5) quit.
+Deleting always asks you to type `yes`; nothing is overwritten; `.github/` and `bot1/` can't be deleted or moved.
+First run asks for your repo (`username/repo`) and a GitHub token (Contents: Read and write) and can save them privately.
+
+**On github.com:** Actions tab -> **Bot 1 - Request** -> *Run workflow* -> pick `list-files`, `delete-file` or `move-file`,
+fill in the path (tick *confirm* for a delete) and run it. To *push* a file there, upload it into `inbox/`.
+
 ## Optional: push straight from your Mac (no github.com)
 Double-click `Start-Bot1-Drop.command` (from the zip). Everything you drop into `~/BotDrop` is pushed and filed.
 Or: `python3 -m bot1 push report.pdf photo.png`, `python3 -m bot1 push x.txt --to docs`, `python3 -m bot1 watch ~/BotDrop`

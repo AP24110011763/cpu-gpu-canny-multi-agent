@@ -69,3 +69,33 @@ class GitHubRepo:
             raise translate_error(e) from None
         c = res["commit"]
         return CommitInfo(sha=c.sha, url=getattr(c, "html_url", "") or "")
+
+    def delete_path(self, path: str, message: str) -> CommitInfo:
+        """Delete one file (it stays recoverable from the git history)."""
+        shas = self.tree_shas()
+        if path not in shas:
+            raise BotError(f"'{path}' was not found in the repository.")
+        try:
+            res = self._repo.delete_file(path, message, shas[path], branch=self.branch)
+        except self._exc as e:
+            raise translate_error(e) from None
+        c = res["commit"]
+        return CommitInfo(sha=c.sha, url=getattr(c, "html_url", "") or "")
+
+    def move_path(self, old: str, new: str, message: str) -> CommitInfo:
+        """Move/rename a file: create it at the new path, then delete the old one. Never overwrites."""
+        shas = self.tree_shas()
+        if old not in shas:
+            raise BotError(f"'{old}' was not found in the repository.")
+        if new in shas:
+            raise BotError(f"'{new}' already exists, so nothing was moved.")
+        try:
+            import base64
+            blob = self._repo.get_git_blob(shas[old])
+            data = base64.b64decode(blob.content) if blob.encoding == "base64" else blob.content.encode()
+            self._repo.create_file(new, message, data, branch=self.branch)
+            res = self._repo.delete_file(old, message, shas[old], branch=self.branch)
+        except self._exc as e:
+            raise translate_error(e) from None
+        c = res["commit"]
+        return CommitInfo(sha=c.sha, url=getattr(c, "html_url", "") or "")
