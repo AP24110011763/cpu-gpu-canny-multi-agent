@@ -81,3 +81,22 @@ class TestStaticAnalyzer(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSqlInjectionRule(unittest.TestCase):
+    """The rule must not flag the parameterized query that the bot itself recommends."""
+
+    @staticmethod
+    def _sql_titles(line: str) -> list[str]:
+        fd = FileDiff("a.py", additions=1, changed_lines=[ChangedLine("a.py", 1, line)])
+        return [f.title for f in StaticAnalyzer().run_all([fd]) if "SQL" in f.title]
+
+    def test_parameterized_query_is_not_flagged(self):
+        self.assertEqual(self._sql_titles("cursor.execute('SELECT * FROM u WHERE id = %s', (uid,))"), [])
+
+    def test_string_building_is_flagged(self):
+        for line in ("cursor.execute('SELECT * FROM u WHERE id = %s' % uid)",
+                     "cursor.execute(\"SELECT * FROM u WHERE id=\" + uid)",
+                     "cursor.execute(f\"SELECT * FROM u WHERE id={uid}\")",
+                     "cursor.execute('SELECT {}'.format(uid))"):
+            self.assertTrue(self._sql_titles(line), line)

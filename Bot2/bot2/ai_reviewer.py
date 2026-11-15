@@ -70,7 +70,7 @@ class AIReviewer:
 
         user_content = f"Please review this Pull Request diff:\n\n```diff\n{prepared_diff}\n```"
 
-        endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent?key={self.api_key}"
+        endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
         payload = {
             "contents": [
                 {
@@ -88,7 +88,7 @@ class AIReviewer:
         req = urllib.request.Request(
             endpoint,
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "x-goog-api-key": self.api_key},
             method="POST",
         )
 

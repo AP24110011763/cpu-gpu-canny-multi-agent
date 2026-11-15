@@ -102,7 +102,7 @@ class StaticAnalyzer:
             "Replace `os.system()` with `subprocess.run([...], check=True)` passing argument lists.",
         ),
         (
-            re.compile(r"""(?i)\b(?:cursor|db|conn)\.execute\s*\(.*?%\s*s|f['"].*?\b(?:SELECT|INSERT|UPDATE|DELETE)\b.*?\{"""),
+            re.compile(r"""(?i)\b(?:cursor|db|conn)\.execute\s*\(\s*(?:f['"]|['"][^'"]*['"]\s*(?:%\s*[\w(]|\.format\s*\(|\+))|f['"].*?\b(?:SELECT|INSERT|UPDATE|DELETE)\b.*?\{"""),
             "Potential SQL Injection Risk",
             "CRITICAL",
             "Security",

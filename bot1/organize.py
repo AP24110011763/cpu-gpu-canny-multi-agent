@@ -51,7 +51,7 @@ def _preview(data: bytes) -> str:
         return ""
 
 
-def organize(root: Path, placer=None, inbox: str = "inbox") -> Tuple[List[Move], bool]:
+def organize(root: Path, placer=None, inbox: str = "inbox", ask: bool = False) -> Tuple[List[Move], bool]:
     """Returns (moves, committed)."""
     root = Path(root)
     inbox_dir = root / inbox
@@ -95,6 +95,9 @@ def organize(root: Path, placer=None, inbox: str = "inbox") -> Tuple[List[Move],
                     except BotError:
                         pass
                 folder = validate_folder(folder)
+                if ask and name not in ai and reason.startswith(("unknown file type", "no folder for")):
+                    moves.append(Move(src, "", "asked", f"my best guess was `{folder or 'the root'}/` but I'm not sure"))
+                    continue
             dest = join(folder, name)
             validate_path(dest)
         except BotError as e:
@@ -150,7 +153,7 @@ def push_branch(root: Path, branch: str, retries: int = 3) -> None:
     raise BotError("Could not push to the branch (it may be protected, or it kept changing).")
 
 
-ICON = {"moved": "✅", "renamed": "🔁", "duplicate": "♻️", "secret": "🚨", "refused": "⛔"}
+ICON = {"asked": "❓", "moved": "✅", "renamed": "🔁", "duplicate": "♻️", "secret": "🚨", "refused": "⛔"}
 
 
 def format_report(moves: List[Move]) -> str:

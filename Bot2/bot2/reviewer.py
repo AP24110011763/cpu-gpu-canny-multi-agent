@@ -55,6 +55,15 @@ class ReviewOrchestrator:
         merged.sort(key=lambda x: severity_order.get(x.severity.upper(), 5))
         return merged
 
+    @staticmethod
+    def verify_ai_lines(findings: list[ReviewFinding], file_diffs: list[FileDiff]) -> list[ReviewFinding]:
+        """The model can invent line numbers. Keep a line only if it really is a changed line of that file."""
+        valid = {(cl.file_path, cl.line_number) for fd in file_diffs for cl in fd.changed_lines}
+        for f in findings:
+            if f.line_number is not None and (f.file_path, f.line_number) not in valid:
+                f.line_number = None
+        return findings
+
     def run_review(
         self,
         file_diffs: list[FileDiff],
@@ -75,6 +84,8 @@ class ReviewOrchestrator:
             print(f"INFO: AI review completed with {len(ai_findings)} findings.")
         else:
             print("INFO: AI review skipped (no API key configured). Running in static mode.")
+
+        ai_findings = self.verify_ai_lines(ai_findings, file_diffs)
 
         # 3. Merge & Deduplicate
         all_findings = self.merge_findings(static_findings, ai_findings)

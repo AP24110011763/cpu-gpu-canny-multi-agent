@@ -1,6 +1,6 @@
 # Autonomous GitHub Code Review and Quality Bot (Bot 2)
 
-[![CI Test Suite](https://github.com/owner/repo/actions/workflows/bot-tests.yml/badge.svg)](https://github.com/owner/repo/actions)
+[![CI Test Suite](https://github.com/AP24110011763/cpu-gpu-canny-multi-agent/actions/workflows/bot2-tests.yml/badge.svg)](https://github.com/AP24110011763/cpu-gpu-canny-multi-agent/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
@@ -10,10 +10,11 @@ An autonomous, security-first GitHub Code Review and Quality Bot built as **Bot 
 
 ## 📌 Project Context
 
-This repository is designed around three autonomous bots:
-- **Bot 1:** Repository file manager (adds and deletes files on command).
-- **Bot 2 (This Bot):** Autonomous Code Review and Quality Bot. Inspects pull request changes, detects security vulnerabilities, logic errors, bug risks, test/documentation gaps, and posts actionable reviews automatically via GitHub Actions.
-- **Bot 3:** Operational bot (scheduled maintenance/reporting).
+This repository has two autonomous bots that work as teammates. You can talk to them, and they talk to each other (see [`team/README.md`](../team/README.md)):
+- **Bot 1:** File manager and reporter. Files uploads from `inbox/`, moves/deletes/lists files on command, asks you when unsure where a file belongs, and posts repo activity to the Activity Log issue.
+- **Bot 2 (This Bot):** Autonomous Code Review and Quality Bot. Inspects pull request changes, detects security vulnerabilities, logic errors, bug risks, test/documentation gaps, and posts actionable reviews automatically via GitHub Actions. It also reviews the code files Bot 1 files and reports its verdict back to Bot 1.
+
+> The workflows live in the repository root `.github/workflows/` (`bot2-review.yml`, `bot2-tests.yml`) because GitHub only reads workflows from there. They run the bot with `working-directory: Bot2`.
 
 ---
 
@@ -233,20 +234,3 @@ All changed files were inspected for potential bugs, logic errors, security vuln
 
 1. **Large Diffs:** Extremely large pull requests (>150 KB diffs, generated bundle files) have non-code assets filtered out and large diffs truncated to fit within LLM context windows.
 2. **Third-Party Static Analysis Tools:** To keep Bot 2 lightweight with zero external runtime dependencies, it uses native Python AST parsing and regex rule engines rather than heavyweight tools like SonarQube or Semgrep.
----
-
-## 🔬 Core Academic Project: CPU vs GPU Canny Edge Detection (COA)
-
-### B.Tech Computer Organization and Architecture (COA) Project
-
-This project implements an autonomous multi-agent AI system that compares the performance of CPU and GPU on the classic image processing task of **Canny Edge Detection**.
-
-A user provides an image and a natural language request (e.g. *"Apply edge detection to this image and compare CPU and GPU performance"*). The system then works autonomously using specialized agents:
-
-- **Agent 1 – Task Planner:** Analyzes request and generates structured execution plan.
-- **Agent 2 – Execution Agent:** Runs Canny Edge Detection pipeline on both CPU (`OpenCV`) and GPU (`CuPy`), measuring real execution time.
-- **Agent 3 – Comparison & Analysis Agent:** Evaluates measured results using Computer Organization and Architecture concepts (parallelism, memory hierarchy, data transfer overhead, throughput, Amdahl’s Law).
-
----
-
-> **Note:** This repository includes **Bot 2 (Autonomous Code Review and Quality Bot)** described above, which runs via GitHub Actions to inspect code quality and security on every pull request.

@@ -26,7 +26,7 @@ def _model() -> str:
 
 def cmd_organize() -> int:
     placer = make_placer(os.environ.get("ANTHROPIC_API_KEY", "").strip() or None, _model())
-    moves, committed = organize(Path("."), placer)
+    moves, committed = organize(Path("."), placer, ask=os.environ.get("BOT1_ASK", "").lower() == "true")
     if not moves:
         print("Inbox is empty - nothing to do.")
         return 0
@@ -46,6 +46,11 @@ def cmd_organize() -> int:
             post(GitHubLog(token, repo, os.environ.get("GITHUB_API_URL")), report)
         except Exception as e:
             print(f"Could not post to the activity log: {type(e).__name__}")
+    try:                                    # teammate hooks: ask questions, hand code to Bot 2
+        from team.hooks import after_organize
+        after_organize(moves)
+    except Exception as e:
+        print(f"Team hooks skipped: {type(e).__name__}")
     return 0
 
 
