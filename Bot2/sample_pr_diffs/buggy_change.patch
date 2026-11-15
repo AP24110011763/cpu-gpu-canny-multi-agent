@@ -1,0 +1,30 @@
+diff --git a/src/auth.py b/src/auth.py
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/src/auth.py
+@@ -0,0 +1,24 @@
++import os
++import sqlite3
++
++API_SECRET_KEY = "ghp_1234567890abcdef1234567890abcdef1234"
++
++def authenticate_user(username, password):
++    try:
++        conn = sqlite3.connect("users.db")
++        cursor = conn.cursor()
++        # SQL Injection vulnerability
++        query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
++        cursor.execute(query)
++        user = cursor.fetchone()
++        return user
++    except:
++        pass
++
++def execute_maintenance(cleanup_command):
++    # Command injection vulnerability
++    os.system(cleanup_command)
++
++def eval_expression(expr_str):
++    # Remote code execution risk
++    return eval(expr_str)

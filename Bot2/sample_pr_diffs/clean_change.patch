@@ -1,0 +1,35 @@
+diff --git a/src/math_utils.py b/src/math_utils.py
+new file mode 100644
+index 0000000..2222222
+--- /dev/null
++++ b/src/math_utils.py
+@@ -0,0 +1,15 @@
++"""Mathematical utilities module providing safe operations."""
++
++from typing import Sequence
++
++
++def calculate_average(numbers: Sequence[float]) -> float:
++    """Calculates the arithmetic mean of a sequence of numbers."""
++    if not numbers:
++        raise ValueError("Cannot calculate average of an empty sequence.")
++    return sum(numbers) / len(numbers)
+diff --git a/tests/test_math_utils.py b/tests/test_math_utils.py
+new file mode 100644
+index 0000000..3333333
+--- /dev/null
++++ b/tests/test_math_utils.py
+@@ -0,0 +1,12 @@
++import unittest
++from src.math_utils import calculate_average
++
++class TestMathUtils(unittest.TestCase):
++    def test_average_valid(self):
++        self.assertEqual(calculate_average([2.0, 4.0, 6.0]), 4.0)
++
++    def test_average_empty_raises(self):
++        with self.assertRaises(ValueError):
++            calculate_average([])
++
++if __name__ == "__main__":
++    unittest.main()

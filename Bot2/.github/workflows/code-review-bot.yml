@@ -1,0 +1,42 @@
+name: "Bot 2: Autonomous Code Review and Quality Bot"
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+concurrency:
+  group: bot2-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  code-review:
+    name: "Inspect Code & Post Review"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository code"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Set up Python runtime"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Execute Bot 2 Autonomous Code Review"
+        id: bot2_review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+          REQUIRE_AI_KEY: "false"
+        run: |
+          python3 -m bot2.main
