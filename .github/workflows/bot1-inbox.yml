@@ -30,4 +30,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}   # optional: smarter folder choice
+          BOT1_ASK: 'true'   # ask you when unsure where a file belongs; hand code files to Bot 2
         run: python -m bot1 organize

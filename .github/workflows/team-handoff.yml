@@ -1,0 +1,42 @@
+name: Team - Bots talk to each other
+
+# Bot 1 -> Bot 2: "I filed src/x.py, please review it"   (repository_dispatch: bot2-review-request)
+# Bot 2 -> Bot 1: "approved" / "needs fixes"             (repository_dispatch: bot1-review-result)
+# (Comments made with GITHUB_TOKEN can't wake another workflow, but repository_dispatch can.)
+on:
+  repository_dispatch:
+    types: [bot2-review-request, bot1-review-result]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  bot2-reviews:
+    if: github.event.action == 'bot2-review-request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r bot1/requirements.txt
+      - name: Bot 2 reviews the file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python -m team handoff
+
+  bot1-follows-up:
+    if: github.event.action == 'bot1-review-result'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r bot1/requirements.txt
+      - name: Bot 1 tells you the verdict
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m team result

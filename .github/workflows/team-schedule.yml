@@ -1,0 +1,31 @@
+name: Team - Weekly digest and introductions
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'      # Mondays 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      task:
+        description: What should the bots post?
+        type: choice
+        options: [digest, intro]
+        default: intro
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r bot1/requirements.txt
+      - name: Post
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TASK: ${{ inputs.task || 'digest' }}
+        run: python -m team "$TASK"

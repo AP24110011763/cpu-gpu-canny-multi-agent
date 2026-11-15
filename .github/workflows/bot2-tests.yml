@@ -1,0 +1,38 @@
+name: "Bot 2: CI Test Suite"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "Bot2/**"
+      - "team/**"
+      - "tests/test_team_*.py"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: "Run Unit Tests & Quality Checks"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository code"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python runtime"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Run Bot 2 Unit Tests"
+        working-directory: Bot2
+        run: |
+          python3 -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: "Run team-layer tests (bot messaging)"
+        run: |
+          pip install PyGithub pytest
+          python3 -m pytest tests/test_team.py --noconftest -q
